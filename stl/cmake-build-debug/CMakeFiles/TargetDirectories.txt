@@ -1,0 +1,3 @@
+C:/CPlusPlus/gitlab course/labs/stl/stl/cmake-build-debug/CMakeFiles/stl.dir
+C:/CPlusPlus/gitlab course/labs/stl/stl/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/CPlusPlus/gitlab course/labs/stl/stl/cmake-build-debug/CMakeFiles/rebuild_cache.dir
