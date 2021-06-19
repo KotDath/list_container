@@ -7,7 +7,8 @@ int main() {
 		aboba.PushBack(i);
 	}
 
-	for (auto it = aboba.begin(); it != aboba.end(); ++it) {
-		std::cout << *it << std::endl;
+	MyList<int> amogus(aboba);
+	for (auto it = amogus.begin(); it != amogus.end(); ++it) {
+		std::cout << it->value << std::endl;
 	}
 }

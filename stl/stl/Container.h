@@ -39,14 +39,14 @@ public:
 	void clear();
 private:
 	_Hash hash;
-	size_t NodeCount;
+	size_t nodeCount;
 	size_t bucketCount;
 	float maxLoad;
 	MyList<std::pair<_KeyType, _DataType>>* buckets;
 };
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(size_t bucketCount) : hash(_Hash()), NodeCount(0), bucketCount(bucketCount), maxLoad(4), buckets(nullptr) {
+UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(size_t bucketCount) : hash(_Hash()), nodeCount(0), bucketCount(bucketCount), maxLoad(4), buckets(nullptr) {
 	if (bucketCount > 0) {
 		buckets = new MyList[bucketCount];
 	}
@@ -61,20 +61,22 @@ UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(std::initializer_list<buc
 
 template <class _KeyType, class _DataType, class _Hash>
 UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(const UnorderedMap& other) : hash(other.hash), 
-																					NodeCount(other.NodeCount), bucketCount(other.bucketCount), 
+																					nodeCount(other.nodeCount), bucketCount(other.bucketCount), 
 																					maxLoad(other.maxLoad), buckets(nullptr) {
 	if (bucketCount > 0) {
-		bucketCount = new MyList[bucketCount];
+		buckets = new MyList[bucketCount];
 
 	}
-	//!!!добавить копирование
+	for (size_t i = 0; i < bucketCount; ++i) {
+		buckets[i] = other.buckets[i];
+	}
 }
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(UnorderedMap&& other) : hash(other.hash), NodeCount(other.NodeCount),
+UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(UnorderedMap&& other) : hash(other.hash), nodeCount(other.nodeCount),
 																			   bucketCount(other.bucketCount), maxLoad(other.maxLoad), 
 																			   buckets(other.buckets) {
-	other.NodeCount = 0;
+	other.nodeCount = 0;
 	other.bucketCount = 0;
 	//!!!добавить копирование
 }
@@ -91,7 +93,7 @@ UnorderedMap<_KeyType, _DataType, _Hash>& UnorderedMap<_KeyType, _DataType, _Has
 	}
 
 	hash;
-	NodeCount;
+	nodeCount;
 	bucketCount;
 	maxLoad;
 	buckets = nullptr; //!!!добавить копирование

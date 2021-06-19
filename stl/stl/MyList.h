@@ -35,6 +35,8 @@ template<class _Value>
 class MyList {
 public:
 	MyList();
+	MyList(MyList& other);
+	MyList& operator=(MyList& other);
 	void PushBack(const _Value& val);
 	ListIterator<_Value> begin() { return ListIterator(head); }
 	ListIterator<_Value> end() { 
@@ -50,6 +52,35 @@ private:
 template<class _Value>
 MyList<_Value>::MyList() : head(nullptr), tail(nullptr), count(0) {
 
+}
+
+template<class _Value>
+MyList<_Value>::MyList(MyList<_Value>& other) {
+	for (auto it = other.begin(); it != other.end(); ++it) {
+		PushBack(it->value);
+	}
+}
+
+template<class _Value>
+MyList<_Value>& MyList<_Value>::operator=(MyList& other) {
+	if (this == &other) {
+		return *this;
+	}
+	else {
+		auto* removableNode = head;
+		while (removableNode != tail) {
+			auto* nextPtr = removableNode->right;
+			delete removableNode;
+			removableNode = nextPtr;
+		}
+		delete tail;
+		head = nullptr;
+		tail = nullptr;
+		count = 0;
+		for (auto it = other.begin(); it != other.end(); ++it) {
+			PushBack(it->value);
+		}
+	}
 }
 
 template<class _Value>
@@ -86,7 +117,9 @@ MyList<_Value>::~MyList() {
 	}
 
 	delete tail;
-
+	head = nullptr;
+	tail = nullptr;
+	count = 0;
 }
 
 template<class _Value>
