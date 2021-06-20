@@ -38,6 +38,7 @@ public:
 	size_t size();
 	void clear();
 private:
+	void rehash();
 	_Hash hash;
 	size_t nodeCount;
 	size_t bucketCount;
@@ -78,7 +79,8 @@ UnorderedMap<_KeyType, _DataType, _Hash>::UnorderedMap(UnorderedMap&& other) : h
 																			   buckets(other.buckets) {
 	other.nodeCount = 0;
 	other.bucketCount = 0;
-	//!!!добавить копирование
+	other.maxLoad = 4;
+	other.buckets = nullptr;
 }
 
 template <class _KeyType, class _DataType, class _Hash>
@@ -92,11 +94,20 @@ UnorderedMap<_KeyType, _DataType, _Hash>& UnorderedMap<_KeyType, _DataType, _Has
 		return *this;
 	}
 
-	hash;
-	nodeCount;
-	bucketCount;
-	maxLoad;
-	buckets = nullptr; //!!!добавить копирование
+	hash = other.hash;
+	nodeCount = other.nodeCount;
+	if (bucketCount != other.bucketCount && other.bucketCount != 0) {
+		delete[] buckets;
+	}
+	bucketCount = other.bucketCount;
+	maxLoad = other.maxLoad;
+	if (bucketCount > 0) {
+		buckets = new MyList[bucketCount];
+
+	}
+	for (size_t i = 0; i < bucketCount; ++i) {
+		buckets[i] = other.buckets[i];
+	}
 	return *this;
 }
 
@@ -105,11 +116,23 @@ UnorderedMap<_KeyType, _DataType, _Hash>& UnorderedMap<_KeyType, _DataType, _Has
 	if (this == &other) {
 		return *this;
 	}
+
+	delete[] buckets;
+	hash = other.hash;
+	nodeCount = other.nodeCount;
+	bucketCount = other.bucketCount;
+	maxLoad = other.maxLoad;
+	buckets = other.buckets;
+	other.nodeCount = 0;
+	other.bucketCount = 0;
+	other.maxLoad = 4;
+	other.buckets = nullptr;
 }
 
 template <class _KeyType, class _DataType, class _Hash>
 _DataType& UnorderedMap<_KeyType, _DataType, _Hash>::operator[](const _KeyType& key) {
-
+	size_t position = hash(key) % bucketCount;
+	buckets[position];
 }
 
 template <class _KeyType, class _DataType, class _Hash>
@@ -128,18 +151,25 @@ void  UnorderedMap<_KeyType, _DataType, _Hash>::maxLoadFactor(size_t val) {
 }
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMapIterator<_KeyType, _DataType> UnorderedMap<_KeyType, _DataType, _Hash>::begin() {
-
+UnorderedMap<_KeyType, _DataType, _Hash>::iterator UnorderedMap<_KeyType, _DataType, _Hash>::begin() {
+	return;
 }
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMapIterator<_KeyType, _DataType> UnorderedMap<_KeyType, _DataType, _Hash>::end() {
-
+UnorderedMap<_KeyType, _DataType, _Hash>::iterator UnorderedMap<_KeyType, _DataType, _Hash>::end() {
+	return;
 }
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMapIterator<_KeyType, _DataType> UnorderedMap<_KeyType, _DataType, _Hash>::insert(const bucketCell& insertData) {
+UnorderedMap<_KeyType, _DataType, _Hash>::iterator UnorderedMap<_KeyType, _DataType, _Hash>::insert(const bucketCell& insertData) {
+	if (static_cast<float>(nodeCount) / bucketCount >= maxLoad) {
+		rehash();
+	}
 
+	size_t position = hash(insertData.first) % bucketCount;
+	buckets[position].PushBack(insertData);
+	++nodeCount;
+	return;
 }
 
 template <class _KeyType, class _DataType, class _Hash>
@@ -148,6 +178,16 @@ void UnorderedMap<_KeyType, _DataType, _Hash>::erase(_KeyType key) {
 }
 
 template <class _KeyType, class _DataType, class _Hash>
-UnorderedMapIterator<_KeyType, _DataType> UnorderedMap<_KeyType, _DataType, _Hash>::erase(iterator pos) {
+UnorderedMap<_KeyType, _DataType, _Hash>::iterator UnorderedMap<_KeyType, _DataType, _Hash>::erase(iterator pos) {
 
+}
+
+template<class _KeyType, class _DataType, class _Hash>
+size_t UnorderedMap<_KeyType, _DataType, _Hash>::size() {
+	return nodeCount;
+}
+
+template<class _KeyType, class _DataType, class _Hash>
+bool UnorderedMap<_KeyType, _DataType, _Hash>::empty() {
+	return nodeCount == 0;
 }

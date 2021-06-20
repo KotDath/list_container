@@ -22,7 +22,7 @@ std::istream& operator>>(std::istream& in, Node<_Value>& node) {
 }
 
 template<class _Value>
-std::ostream& operator<<(std::ostream& out, Node<_Value>& node) {
+std::ostream& operator<<(std::ostream& out, const Node<_Value>& node) {
 	out << node.value;
 	return out;
 }
@@ -33,14 +33,28 @@ class ListIterator;
 
 template<class _Value>
 class MyList {
+private:
+	using iterator = ListIterator<_Value>;
+	using constIterator = ListIterator<const _Value>;
 public:
 	MyList();
-	MyList(MyList& other);
-	MyList& operator=(MyList& other);
+	MyList(const MyList& other);
+	MyList& operator=(const MyList& other);
 	void PushBack(const _Value& val);
-	ListIterator<_Value> begin() { return ListIterator(head); }
-	ListIterator<_Value> end() { 
-		return ListIterator<_Value>(nullptr);
+	iterator begin() { 
+		return head;
+	}
+	
+	constIterator cbegin() const {
+		return head;
+	}
+
+	iterator end() {
+		return nullptr;
+	}
+
+	constIterator cend() const {
+		return nullptr;
 	}
 	~MyList();
 private:
@@ -55,14 +69,20 @@ MyList<_Value>::MyList() : head(nullptr), tail(nullptr), count(0) {
 }
 
 template<class _Value>
-MyList<_Value>::MyList(MyList<_Value>& other) {
-	for (auto it = other.begin(); it != other.end(); ++it) {
-		PushBack(it->value);
+MyList<_Value>::MyList(const MyList& other) {
+	auto* node = other.head;
+	if (node != nullptr) {
+		while (node != other.tail) {
+			PushBack(node->value);
+			node = node->right;
+		}
+
+		PushBack(tail->value);
 	}
 }
 
 template<class _Value>
-MyList<_Value>& MyList<_Value>::operator=(MyList& other) {
+MyList<_Value>& MyList<_Value>::operator=(const MyList& other) {
 	if (this == &other) {
 		return *this;
 	}
@@ -77,8 +97,14 @@ MyList<_Value>& MyList<_Value>::operator=(MyList& other) {
 		head = nullptr;
 		tail = nullptr;
 		count = 0;
-		for (auto it = other.begin(); it != other.end(); ++it) {
-			PushBack(it->value);
+		auto* node = other.head;
+		if (node != nullptr) {
+			while (node != other.tail) {
+				PushBack(node->value);
+				node = node->right;
+			}
+
+			PushBack(tail->value);
 		}
 	}
 }
@@ -125,17 +151,19 @@ MyList<_Value>::~MyList() {
 template<class _Value>
 class ListIterator {
 private:
-	using pointer =   Node<_Value>*;
-	using reference = Node<_Value>&;
-	using value =	  Node<_Value>;
+	using pointer = Node<_Value>*;
+	using valueReference = _Value&;
+	using valuePointer = _Value*;
 public:
 	ListIterator(pointer input) : val(input) {}
-	reference operator*() { return *val; }
-	pointer operator->() { return val; }
+	valueReference operator*() { return val->value; }
+	valuePointer operator->() { return &(val->value); }
+	const valueReference operator*() const { return val->value; }
+	const valuePointer operator->() const { return &(val->value); }
 	ListIterator& operator++() { val = val->right; return *this; }
 	ListIterator operator++(int) { pointer = val; val = val->right; return pointer; }
-	friend bool operator==(const ListIterator<_Value>& first, const ListIterator<_Value>& second) { return first.val == second.val; }
-	friend bool operator!=(const ListIterator<_Value>& first, const ListIterator<_Value>& second) { return first.val != second.val; }
+	friend bool operator==(const ListIterator& first, const ListIterator& second) { return first.val == second.val; }
+	friend bool operator!=(const ListIterator& first, const ListIterator& second) { return first.val != second.val; }
 private:
 	pointer val;
 };
