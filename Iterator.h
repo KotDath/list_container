@@ -55,16 +55,51 @@ public:
             return &(val->value);
         }
     }
-    //!!! Отформатировать. Между методами должна быть 1 строка
-    ListIterator& operator++() { val = val->right; return *this; }
-    ListIterator operator++(int) { auto varPointer = *this; val = val->right; return varPointer; }
-    ListIterator& operator--() { val = val->left; return *this; }
-    ListIterator operator--(int) { auto varPointer = *this; val = val->left; return varPointer; }
-    friend bool operator==(const ListIterator& first, const ListIterator& second) { return first.val == second.val; }
-    friend bool operator!=(const ListIterator& first, const ListIterator& second) { return first.val != second.val; }
 
+    ListIterator& operator++() {
+        if (val == nullptr) {
+            throw BadIteratorException();
+        } else {
+            val = val->right;
+        }
 
-    List<Value>* container; //!! Что за открытое поле?
+        return *this;
+    }
+
+    ListIterator operator++(int) {
+        auto varPointer = *this;
+        if (val == nullptr) {
+            throw BadIteratorException();
+        } else {
+            val = val->right;
+        }
+        return varPointer;
+    }
+
+    ListIterator& operator--() {
+        if (val == nullptr) {
+            throw BadIteratorException();
+        } else {
+            val = val->left;
+        }
+
+        return *this;
+    }
+
+    ListIterator operator--(int) {
+        auto varPointer = *this;
+        if (val == nullptr) {
+            throw BadIteratorException();
+        } else {
+            val = val->left;
+        }
+        return varPointer;
+    }
+
+    friend bool operator==(const ListIterator& first, const ListIterator& second) { return first.val == second.val && first.container == second.container; }
+
+    friend bool operator!=(const ListIterator& first, const ListIterator& second) { return first.val != second.val || first.container != second.container; }
 private:
+    List<Value>* container;
     pointer val;
 };

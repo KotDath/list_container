@@ -5,8 +5,8 @@
 
 template<class Iterator>
 concept Iterable = requires(Iterator first, Iterator second) {
-    { first == second} -> std::same_as<bool>;             //!!! is_convertible
-    { first != second} -> std::same_as<bool>;          //!!! is_convertible
+    { first != second} -> std::convertible_to<bool>;
+    { first == second} -> std::convertible_to<bool>;
     {*first} -> std::same_as<std::iter_reference_t<Iterator>>;
     *first = *second;
     first = second;
@@ -18,17 +18,8 @@ concept Iterable = requires(Iterator first, Iterator second) {
 
 
 template<class Iterator, class Predicate>
-concept ConceptPredicate = requires(Iterator it, Predicate predicate1, Predicate predicate2){
-    
-    //!!! Не очень понятно, какой смысл сравнивать bool с bool (true == true, false == true и т.д.)
-    { predicate1(*it) == predicate2(*it)} -> std::same_as<bool>;
-    { predicate1(*it) != predicate2(*it)} -> std::same_as<bool>;
-    
-    
-    
-    
-    
-    {predicate1(*it)} -> std::same_as<bool>; //!!! is_convertible
+concept ConceptPredicate = requires(Iterator first, Iterator second, Predicate predicate) {
+    {predicate(*first, *second)} -> std::convertible_to<bool>;
 };
 
 template<class Iterator, class Function>
@@ -36,11 +27,17 @@ concept ConceptLambda = requires(Function lambda, Iterator it) {
     lambda(*it);
 };
 
-template<class Iterator, class Predicate>
-requires Iterable<Iterator> && ConceptPredicate<Iterator, Predicate>
-Iterator findIf(Iterator beg, Iterator end, Predicate p) {
+template<class Iterator, class Function>
+concept Condition = requires(Iterator it, Function expression) {
+    {expression(*it)} -> std::convertible_to<bool>;
+};
+
+
+template<class Iterator, class Function>
+requires Iterable<Iterator> && Condition<Iterator, Function>
+Iterator findIf(Iterator beg, Iterator end, Function f) {
     for (; beg != end; ++beg) {
-        if (p(*beg)) {
+        if (f(*beg)) {
             return beg;
         }
     }
@@ -48,13 +45,13 @@ Iterator findIf(Iterator beg, Iterator end, Predicate p) {
     return end;
 }
 
-template <class Iterator, class Function>
-requires Iterable<Iterator> && ConceptLambda<Iterator, Function>
-Iterator maxElement(Iterator beg, Iterator end, Function comp) {
+template <class Iterator, class Predicate>
+requires Iterable<Iterator> && ConceptPredicate<Iterator, Predicate>
+Iterator maxElement(Iterator beg, Iterator end, Predicate comp) {
     Iterator res = beg;
     ++beg;
     for(; beg != end; ++beg) {
-        if (comp(*beg) > comp(*res)) { //!!! Неверно. Должен быть бинарный предикат (с проверкой на >)
+        if (comp(*res, *beg)) {
             res = beg;
         }
     }
@@ -62,13 +59,13 @@ Iterator maxElement(Iterator beg, Iterator end, Function comp) {
     return res;
 }
 
-template <class Iterator, class Function>
-requires Iterable<Iterator> && ConceptLambda<Iterator, Function>
-Iterator minElement(Iterator beg, Iterator end, Function comp) {
+template <class Iterator, class Predicate>
+requires Iterable<Iterator> && ConceptPredicate<Iterator, Predicate>
+Iterator minElement(Iterator beg, Iterator end, Predicate comp) {
     Iterator res = beg;
     ++beg;
     for(; beg != end; ++beg) {
-        if (comp(*beg) < comp(*res)) { //!!! Неверно. Должен быть бинарный предикат (с проверкой на <)
+        if (comp(*beg, *res)) {
             res = beg;
         }
     }
@@ -77,19 +74,19 @@ Iterator minElement(Iterator beg, Iterator end, Function comp) {
 }
 
 
-template <class Iterator, class Function>
-requires Iterable<Iterator> && ConceptLambda<Iterator, Function>
-void Sort(Iterator beg, Iterator end, Function comp) {
+template <class Iterator, class Predicate>
+requires Iterable<Iterator> && ConceptPredicate<Iterator, Predicate>
+void Sort(Iterator beg, Iterator end, Predicate comp) {
     for (; beg != end; beg++){
         std::iter_swap(beg, minElement(beg, end, comp));
     }
 }
 
-template <class Iterator, class Predicate>
-requires Iterable<Iterator> && ConceptPredicate<Iterator, Predicate>
-void copyIf(Iterator sourceBeg, Iterator sourceEnd, Iterator destBeg, Predicate pred) {
+template <class Iterator, class Function>
+requires Iterable<Iterator> && Condition<Iterator, Function>
+void copyIf(Iterator sourceBeg, Iterator sourceEnd, Iterator destBeg, Function f) {
     for(; sourceBeg != sourceEnd; ++sourceBeg){
-        if (pred(*sourceBeg)) {
+        if (f(*sourceBeg)) {
             *destBeg = *sourceBeg;
             ++destBeg;
         }

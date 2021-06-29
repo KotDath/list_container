@@ -2,10 +2,6 @@
 #include "Iterator.h"
 #include "Algorithms.h"
 
-
-//!!! Не нашел файла с исключениями
-
-
 struct Goods {
     Goods(uint32_t id = 0, const std::string& name = " ", const std::string& manufacturer = " ",
           const std::string& warehouse_address = " ", double weight = 0);
@@ -64,8 +60,8 @@ int main() {
         forEach(cont_1.begin(), cont_1.end(), Print);
         std::cout << "Sorted cont_1 by name:" << std::endl;
         
-        Sort(cont_1.begin(), cont_1.end(), [](const auto& g) { //!!! Неверный предикат - он должен быть бинарным и реализовывать <
-            return g.m_name;
+        Sort(cont_1.begin(), cont_1.end(), [](const auto& first, const auto& second) {
+            return first.m_name < second.m_name;
         });
         
         forEach(cont_1.begin(), cont_1.end(), Print);
