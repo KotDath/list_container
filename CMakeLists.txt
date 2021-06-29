@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 project(exam)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
-add_executable(exam main.cpp MyList.h Container.h Algorithms.h Iterator.h)
+include_directories(Exceptions)
+
+add_executable(exam Algorithms.h Container.h Iterator.h main.cpp Exceptions/RemoveException.h Exceptions/BadIteratorException.h)
