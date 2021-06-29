@@ -2,6 +2,10 @@
 #include "Iterator.h"
 #include "Algorithms.h"
 
+
+//!!! Не нашел файла с исключениями
+
+
 struct Goods {
     Goods(uint32_t id = 0, const std::string& name = " ", const std::string& manufacturer = " ",
           const std::string& warehouse_address = " ", double weight = 0);
