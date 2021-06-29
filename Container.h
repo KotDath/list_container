@@ -28,10 +28,15 @@ public:
     using iterator = ListIterator<Value>;
     using constIterator = ListIterator<const Value>;
 
+    //!!! Методы должны быть определены в шаблоне
+
     List();
     explicit List(size_t count);
     List(size_t count,const Value& defaultValue);
+    
+    //!!! Данный метод должен работать с итераторами любого типа
     List(iterator begin, iterator end);
+    
     List(std::initializer_list<Value> init);
     List(const List& other);
     List(List&& other);
@@ -42,10 +47,10 @@ public:
     List& operator=(List&& other);
 
     iterator begin();
-    iterator begin() const;
+    iterator begin() const; //!!! Это лишнее, т.к. нужно тогда создавать const_iterator
 
     iterator end();
-    iterator end() const;
+    iterator end() const; //!!! Это лишнее, т.к. нужно тогда создавать const_iterator
 
     void pushBack(const Value& elem);
     void popBack();
@@ -53,13 +58,16 @@ public:
     void popFront();
 
     iterator insert(iterator pos, const Value& elem);
+    
+    //!!! Данный метод должен работать с итераторами любого типа
     iterator insert(iterator pos, iterator begin, iterator end);
+    
     iterator erase(iterator pos);
 
     void resize(size_t num);
-    bool empty();
-    size_t size();
-    void clear();
+    bool empty();      //!!! Почему не константный
+    size_t size();     //!!! Почему не константный
+    void clear();      
 private:
     Node<Value>* head;
     Node<Value>* tail;
@@ -132,6 +140,8 @@ List<Value>& List<Value>::operator=(List&& other) {
     if (&other == this) {
         return *this;
     }
+
+    //!!! А очитить список? Тут утечка...
 
     head = other.head;
     tail = other.tail;
