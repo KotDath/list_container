@@ -5,11 +5,11 @@
 struct Goods {
     Goods(uint32_t id = 0, const std::string& name = " ", const std::string& manufacturer = " ",
           const std::string& warehouse_address = " ", double weight = 0);
-    uint32_t m_id; // ��� ⮢��
-    std::string m_name; // ��������
-    std::string m_manufacturer; // �ந�����⥫�
-    std::string m_warehouse_address; // ���� ᪫���
-    double m_weight; // ���
+    uint32_t m_id; // Š®¤ â®¢ à 
+    std::string m_name; //  §¢ ­¨¥
+    std::string m_manufacturer; // à®¨§¢®¤¨â¥«ì
+    std::string m_warehouse_address; // €¤à¥á áª« ¤ 
+    double m_weight; // ‚¥á
 };
 
 Goods::Goods(uint32_t id, const std::string& name, const std::string& manufacturer,
@@ -59,9 +59,11 @@ int main() {
         cont_1.insert(++(++cont_1.begin()), cont_2.begin(), cont_2.end());
         forEach(cont_1.begin(), cont_1.end(), Print);
         std::cout << "Sorted cont_1 by name:" << std::endl;
-        Sort(cont_1.begin(), cont_1.end(), [](const auto& g) {
+        
+        Sort(cont_1.begin(), cont_1.end(), [](const auto& g) { //!!! Неверный предикат - он должен быть бинарным и реализовывать <
             return g.m_name;
         });
+        
         forEach(cont_1.begin(), cont_1.end(), Print);
         double val;
         std::cout << "Input weight ";
