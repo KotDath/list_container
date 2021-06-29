@@ -55,6 +55,7 @@ public:
             return &(val->value);
         }
     }
+    //!!! Отформатировать. Между методами должна быть 1 строка
     ListIterator& operator++() { val = val->right; return *this; }
     ListIterator operator++(int) { auto varPointer = *this; val = val->right; return varPointer; }
     ListIterator& operator--() { val = val->left; return *this; }
@@ -62,7 +63,8 @@ public:
     friend bool operator==(const ListIterator& first, const ListIterator& second) { return first.val == second.val; }
     friend bool operator!=(const ListIterator& first, const ListIterator& second) { return first.val != second.val; }
 
-    List<Value>* container;
+
+    List<Value>* container; //!! Что за открытое поле?
 private:
     pointer val;
 };
